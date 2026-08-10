@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terminbuchung – Ihr Betrieb</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">T</span>
+      <div class="brand-text">
+        <strong>Ihr Betrieb</strong>
+        <span>Terminbuchung online</span>
+      </div>
+    </div>
+    <nav class="view-switch" role="tablist" aria-label="Ansicht wählen">
+      <button class="switch-btn is-active" data-view="booking" role="tab" aria-selected="true">Termin buchen</button>
+      <button class="switch-btn" data-view="admin" role="tab" aria-selected="false">Für Inhaber</button>
+    </nav>
+  </header>
+
+  <!-- ===================== KUNDEN-ANSICHT ===================== -->
+  <main id="view-booking" class="view">
+
+    <section class="intro">
+      <h1>Termin online buchen</h1>
+      <p>Wählen Sie einen freien Termin im Kalender, tragen Sie Ihre Daten ein &ndash; fertig.</p>
+    </section>
+
+    <div class="booking-layout">
+
+      <section class="calendar-card" aria-label="Kalender">
+        <div class="calendar-head">
+          <button id="prevMonth" class="nav-btn" aria-label="Vorheriger Monat">&#8249;</button>
+          <h2 id="monthLabel"></h2>
+          <button id="nextMonth" class="nav-btn" aria-label="Nächster Monat">&#8250;</button>
+        </div>
+        <div class="weekday-row">
+          <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+        </div>
+        <div id="calendarGrid" class="calendar-grid"></div>
+        <div class="calendar-legend">
+          <span class="legend-item"><i class="dot dot-free"></i>Freie Termine</span>
+          <span class="legend-item"><i class="dot dot-full"></i>Ausgebucht</span>
+          <span class="legend-item"><i class="dot dot-closed"></i>Geschlossen</span>
+        </div>
+      </section>
+
+      <section class="slots-card" aria-label="Uhrzeiten">
+        <h2 id="slotsHeading">Bitte wählen Sie zuerst einen Tag</h2>
+        <div id="slotsList" class="slots-list"></div>
+      </section>
+
+    </div>
+
+    <p class="storage-note">Hinweis: Diese Testversion speichert Buchungen aktuell nur in diesem Browser. Nach dem Upgrade läuft alles über eine echte, dauerhafte Datenbank.</p>
+
+  </main>
+
+  <!-- ===================== INHABER-ANSICHT ===================== -->
+  <main id="view-admin" class="view is-hidden">
+
+    <section class="intro">
+      <h1>Übersicht &amp; Verwaltung</h1>
+      <p>Alle Buchungen im Blick &ndash; und Zeiten blockieren, in denen Sie nicht verfügbar sind.</p>
+    </section>
+
+    <div class="admin-stats">
+      <div class="stat-card">
+        <span class="stat-value" id="statUpcoming">0</span>
+        <span class="stat-label">Kommende Termine</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="statToday">0</span>
+        <span class="stat-label">Heute</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="statBlocked">0</span>
+        <span class="stat-label">Blockierte Zeiten</span>
+      </div>
+    </div>
+
+    <div class="admin-layout">
+
+      <section class="panel" aria-label="Buchungen">
+        <h2>Buchungen</h2>
+        <div id="bookingsTableWrap" class="table-wrap">
+          <table class="bookings-table">
+            <thead>
+              <tr>
+                <th>Datum</th>
+                <th>Uhrzeit</th>
+                <th>Name</th>
+                <th>Telefon</th>
+                <th>Anliegen</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="bookingsBody"></tbody>
+          </table>
+          <p id="noBookings" class="empty-hint is-hidden">Noch keine Buchungen vorhanden.</p>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="Zeiten blockieren">
+        <h2>Zeit blockieren</h2>
+        <p class="panel-hint">Markieren Sie einzelne Termine oder einen ganzen Tag als nicht verfügbar.</p>
+        <form id="blockForm" class="block-form">
+          <label>
+            Datum
+            <input type="date" id="blockDate" required>
+          </label>
+          <label>
+            Uhrzeit
+            <select id="blockTime" required>
+              <option value="__day__">Ganzer Tag</option>
+            </select>
+          </label>
+          <button type="submit" class="btn-primary">Blockieren</button>
+        </form>
+
+        <h3 class="sub-heading">Aktuell blockiert</h3>
+        <ul id="blockedList" class="blocked-list"></ul>
+        <p id="noBlocked" class="empty-hint is-hidden">Keine blockierten Zeiten.</p>
+      </section>
+
+    </div>
+
+  </main>
+
+</div>
+
+<!-- ===================== BUCHUNGS-MODAL ===================== -->
+<div id="bookingModal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card">
+    <button class="modal-close" id="modalClose" aria-label="Schließen">&times;</button>
+    <h2 id="modalTitle">Termin bestätigen</h2>
+    <p id="modalSlotInfo" class="modal-slot-info"></p>
+    <form id="bookingForm">
+      <label>
+        Name
+        <input type="text" id="custName" required placeholder="Vor- und Nachname">
+      </label>
+      <label>
+        Telefonnummer
+        <input type="tel" id="custPhone" required placeholder="z. B. 0151 23456789">
+      </label>
+      <label>
+        Anliegen
+        <textarea id="custReason" required placeholder="Worum geht es bei Ihrem Termin?" rows="3"></textarea>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" id="modalCancel">Abbrechen</button>
+        <button type="submit" class="btn-primary">Termin buchen</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div id="toast" class="toast is-hidden"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

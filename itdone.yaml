@@ -1,0 +1,6 @@
+version: "1"
+kind: frontend
+services:
+  app:
+    path: ./app
+    port: 8080
